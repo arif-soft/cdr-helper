@@ -185,7 +185,7 @@
                     <input id="mnc" list="operator-list" type="text"
                            placeholder="MNC: GP 01, Robi & Airtel 02, Banglalink 03, Teletalk 04"
                            pattern="^0[1-9]$" title="Must start with 0 and be followed by 1-9 (e.g., 01, 02)"
-                           oninput="if(/^\d$/.test(this.value)) this.value = '0' + this.value;" required/>
+                           required/>
 
                     <datalist id="operator-list">
                         <option value="01" label="Grameenphone">
@@ -197,7 +197,6 @@
                     <input id="network-type" list="network-type-list" type="text"
                            placeholder="Network type: 2G, 3G, 4G, 5G ..." pattern="(2G|3G|4G|5G|6G)"
                            title="Only 2G, 3G, 4G, 5G, 6G allowed"
-                           oninput="if(/^\d+$/.test(this.value)) this.value += 'G'; this.value = this.value.replace(/g/g, 'G');"
                            required/>
 
                     <datalist id="network-type-list">
@@ -280,11 +279,11 @@
         </div>
         <div class="column" style="opacity: 50%;">
             <h4>Find bparty TrueCaller name (or NID details)</h4>
-            <textarea id="" placeholder="" disabled></textarea>
-            <p id="" class="rowNo">Rows / Lines: 0</p>
-            <textarea id="" placeholder="" disabled></textarea>
-            <p id="" class="rowNo">Converted rows: 0</p>
-            <button id="" disabled>Copy</button>
+            <textarea id="a" placeholder="" disabled></textarea>
+            <p id="b" class="rowNo">Rows / Lines: 0</p>
+            <textarea id="c" placeholder="" disabled></textarea>
+            <p id="d" class="rowNo">Converted rows: 0</p>
+            <button id="e" disabled>Copy</button>
         </div>
     </div>
 </div>
@@ -869,6 +868,7 @@
         //**
         // Cradetialls (encrypted)
         // Y29nZWM3NDM4OUBudW1lcm9iby5jb20KeWVnaXY3NTQxM0BtaW5kdWxzLmNvbQpha3dscmdAYXp6YW5jb2ZmZWUuY29tCmF6M3Jzam9Aa2VuaHBoaW0ubmV0CmJhbmdsYTEyMzRAIS4uLkg=
+        // https://arif - soft.github.io/cdr-helper/
         // **//
     });
 
