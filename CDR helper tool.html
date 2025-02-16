@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDR Helper Software</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            flex: 1;
+            padding: 16px;
+        }
+
+        /* Header styles */
+        .header {
+            /* background-color: #1D6F42; */
+            /* color: white; */
+            color: #333;
+            text-align: center;
+            padding: 16px;
+            padding-bottom: 8px;
+            /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
+        }
+
+        .header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+
+        /* Layout for rows and columns */
+        .row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .column {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            /* box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); */
+        }
+
+        h4 {
+            margin-bottom: 16px;
+            color: #333;
+            user-select: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            /* box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); */
+            outline: none;
+            resize: none;
+            background-color: #fff;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            /* box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); */
+            outline: none;
+            resize: none;
+            background-color: #fff;
+            display: block;
+            box-sizing: border-box;
+        }
+
+
+        input::-webkit-calendar-picker-indicator {
+            opacity: 0;
+        }
+
+        textarea::placeholder,
+        input::placeholder {
+            font-size: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 16px;
+            background-color: #1D6F42;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #257a4b;
+        }
+
+        button:disabled {
+            opacity: 70%;
+            cursor: not-allowed;
+        }
+
+        .rowNo {
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+            padding-top: 4px;
+            padding-bottom: 4px;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            padding: 10px 0;
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+        }
+
+        /* Responsive layout */
+        @media screen and (max-width: 768px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header Section -->
+<div class="header">
+    <h1>CDR Helper Software</h1>
+</div>
+<div class="container">
+    <!-- First Row -->
+    <div class="row">
+        <div class="column">
+            <div style="display: flex; flex-direction: column; height: 100%;">
+                <h4>Lac cell id to Google map lat lon location</h4>
+                <form id="lac_cell_form" action="" style="display: flex; gap: 8px; flex-direction: column;">
+                    <input id="mnc" list="operator-list" type="text"
+                           placeholder="MNC: GP 01, Robi & Airtel 02, Banglalink 03, Teletalk 04"
+                           pattern="^0[1-9]$" title="Must start with 0 and be followed by 1-9 (e.g., 01, 02)"
+                           oninput="if(/^\d$/.test(this.value)) this.value = '0' + this.value;" required/>
+
+                    <datalist id="operator-list">
+                        <option value="01" label="Grameenphone">
+                        <option value="02" label="Robi / Airtel">
+                        <option value="03" label="Banglalink">
+                        <option value="04" label="Teletalk">
+                    </datalist>
+
+                    <input id="network-type" list="network-type-list" type="text"
+                           placeholder="Network type: 2G, 3G, 4G, 5G ..." pattern="(2G|3G|4G|5G|6G)"
+                           title="Only 2G, 3G, 4G, 5G, 6G allowed"
+                           oninput="if(/^\d+$/.test(this.value)) this.value += 'G'; this.value = this.value.replace(/g/g, 'G');"
+                           required/>
+
+                    <datalist id="network-type-list">
+                        <option value="2G">
+                        <option value="3G">
+                        <option value="4G">
+                    </datalist>
+
+                    <input id="lac" type="text" placeholder="Lac id" pattern="[0-9]+"
+                           title="Only numbers are allowed" required/>
+
+                    <input id="cell" type="text" placeholder="Cell id" pattern="[0-9]+"
+                           title="Only numbers are allowed" required/>
+                </form>
+                <div style="display: flex; flex-direction: column; margin-top: 12px; font-size: 12px;">
+                    <div>
+                        <span id="address"></span> <br>
+                        <a id="map-link" href="" target="_blank"
+                           style="color: #257a4b; text-decoration: underline;">
+
+                        </a>
+                    </div>
+                </div>
+                <div style="flex-grow: 1; display: flex; flex-direction: column-reverse; padding-top: 16px;">
+                    <button id="find-map-location" form="lac_cell_form" type="submit"
+                            style="display: block; margin-top: auto;"><span id="rotate-map-emoji"
+                                                                            style="display: inline-block;">🌍</span>
+                        <span id="find-map-location-btn-text">Find
+                                Map Location</span></button>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <h4>Convert unforamted date</h4>
+            <textarea id="unformatedDate"
+                      placeholder="CDR এর আনফর্মেটেড ডেট এর কলাম এখানে পেস্ট করুন"></textarea>
+            <p id="formatedDateRowNo" class="rowNo">Rows / Lines: 0</p>
+
+            <textarea id="formatedDate" placeholder="ফর্মেটেড ডেট ও টাইম কলামকে এখান থেকে কপি করুন"></textarea>
+            <p id="unformatedDateRowNo" class="rowNo">Converted rows: 0</p>
+
+            <button id="copyFormatedDate">Copy</button>
+        </div>
+        <div class="column">
+            <h4>Convert bparty code to normal text</h4>
+            <textarea id="bpartyInput" placeholder="CDR এর সম্পুর্ণ Bparty কলাম এখানে পেস্ট করুন"></textarea>
+            <p id="bpartyInputLines" class="rowNo">Rows / Lines: 0</p>
+
+            <textarea id="bpartyOutput"
+                      placeholder="Bparty এর কোড নরমাল টেক্সটে কনভার্ট হয়ে গেলে তারপর তা কপি করে নতুন এক্সেলের কলামে পেস্ট করুন"></textarea>
+            <p id="bpartyOutputLines" class="rowNo">Converted rows: 0</p>
+
+            <button id="copyConvertedText">Copy</button>
+        </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row">
+        <div class="column">
+            <h4>Multiple LAC & Cell ids to Google My Maps CSV</h4>
+            <textarea id="lacCellList"
+                      placeholder="C(cell), L(lac), M(MNC), N(network type), Co(count), others, row column ফর্মেটে ডাটা পেস্ট করুন"></textarea>
+            <p id="lacCellLineCount" class="rowNo">Rows / Lines: 0</p>
+            <textarea id="convertedLacCellList" placeholder=""></textarea>
+            <p id="convertedlacCellLineCount" class="rowNo">Converted rows: 0</p>
+            <button id="downLatLongCsv">Download CSV</button>
+        </div>
+
+        <div class="column">
+            <h4>Multiple addresses to Google My Maps CSV</h4>
+            <textarea id="addressList"
+                      placeholder="CDR এর এড্রেস কলাম (হেডার সহ) এখানে পেস্ট করুন ('Address'  'Count of ADDRESS')"></textarea>
+            <p id="addressListCount" class="rowNo">Rows / Lines: 0</p>
+
+            <textarea id="addressListCsv"
+                      placeholder="কনভার্ট হওয়া CSV ফাইল ডাউনলোড করে তা Google My Maps এ আপলোড করুন, আসামীর সকল লোকেশন এক সাথে ম্যাপ আকারে দেখার জন্য"></textarea>
+            <p id="convertedAddressListCount" class="rowNo">Converted rows: 0</p>
+
+            <button id="downloadAddressCSV">Download CSV</button>
+        </div>
+        <div class="column" style="opacity: 50%;">
+            <h4>Find bparty TrueCaller name (or NID details)</h4>
+            <textarea id="" placeholder="" disabled></textarea>
+            <p id="" class="rowNo">Rows / Lines: 0</p>
+            <textarea id="" placeholder="" disabled></textarea>
+            <p id="" class="rowNo">Converted rows: 0</p>
+            <button id="" disabled>Copy</button>
+        </div>
+    </div>
+</div>
+<!-- Footer Section -->
+<footer>
+    Made by <strong>ARIF</strong>. Contact me for any kind of software development.
+</footer>
+
+
+<script>
+    // >>>>>>>>>>>>>>>>> Get single Google Map cell location from LAC and Cell ID >>>>>>>>>>>>>>>>>>
+    // API কী সমূহ
+    const apiKeys = [
+        "pk.77190487317f8cf7ce292ca56ebd1392",
+        "pk.0bd32a2be4cf11a34b4de11e222c1eef",
+        "pk.572f206fd0b6f9cfe93b515b85402cee",
+        "pk.cf2a2cf58fff26e0858ed852498dd4d0"
+    ];
+    // DOM এলিমেন্ট সংগ্রহ
+    const mncInput = document.getElementById("mnc");
+    const networkTypeInput = document.getElementById("network-type");
+    const lacInput = document.getElementById("lac");
+    const cellInput = document.getElementById("cell");
+    const findLocationBtn = document.getElementById("find-map-location");
+    const form = document.getElementById("lac_cell_form");
+    const addressElement = document.getElementById("address");
+    const mapLinkElement = document.getElementById("map-link");
+    const rotateEmoji = document.getElementById("rotate-map-emoji");
+    const findLocationBtnText = document.getElementById("find-map-location-btn-text");
+
+    let checkedKeys = new Set(); // ইতিমধ্যে চেক করা API কী সংরক্ষণ করবে
+    let isFirstRequest = true; // প্রথম অনুরোধ চিহ্নিত করার জন্য
+
+    // এলোমেলোভাবে একটি API কী নির্বাচন করা
+    function getRandomApiKey() {
+        const remainingKeys = apiKeys.filter(key => !checkedKeys.has(key));
+        if (remainingKeys.length === 0) {
+            alert("Every API key balance is zero!");
+            return null;
+        }
+        const randomIndex = Math.floor(Math.random() * remainingKeys.length);
+        return remainingKeys[randomIndex];
+    }
+
+    // ব্যালেন্স চেক ফাংশন
+    async function checkBalance(apiKey) {
+        return new Promise(resolve => {
+            const delay = isFirstRequest ? 0 : 1200; // প্রথম অনুরোধে অপেক্ষা করবে না, পরবর্তী অনুরোধে 1200 ms অপেক্ষা করবে
+            setTimeout(() => {
+                fetch(`https://us1.unwiredlabs.com/v2/balance?token=${apiKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "ok" && data.balance_geolocation >= 1) {
+                            resolve(apiKey); // ব্যালেন্স আছে, এই API কী ব্যবহার করা হবে
+                        } else if (data.status === "error") {
+                            alert(data.message); // যদি স্ট্যাটাস "error" হয়, মেসেজ দেখানো হবে
+                            resolve(null);
+                        } else {
+                            checkedKeys.add(apiKey); // ব্যালেন্স না থাকলে লিস্টে যোগ
+                            resolve(null); // নতুন API কী চেক করতে হবে
+                        }
+                    })
+                    .catch(() => {
+                        alert("Balance check API not working!");
+                        resolve(null);
+                    })
+                    .finally(() => {
+                        isFirstRequest = false; // প্রথম অনুরোধ সম্পন্ন হলে সেট করা হবে
+                    });
+            }, delay);
+        });
+    }
+
+    // সঠিক API কী পাওয়া পর্যন্ত চেক করা
+    async function getValidApiKey() {
+        checkedKeys.clear(); // পুরনো চেক করা API রিসেট
+        let apiKey;
+        do {
+            apiKey = getRandomApiKey();
+            if (!apiKey) return null; // সব API ব্যালেন্স শুন্য হলে থামবে
+            apiKey = await checkBalance(apiKey);
+        } while (!apiKey);
+        return apiKey;
+    }
+
+    // API অনুরোধ পাঠানোর ফাংশন
+    async function processApiRequest() {
+        if (!mncInput.value || !networkTypeInput.value || !lacInput.value || !cellInput.value) {
+            alert("সব ইনপুট ফিল্ড পূরণ করুন!");
+            return;
+        }
+
+        const originalButtonText = findLocationBtnText.textContent; // Save the original button text
+        findLocationBtn.disabled = true; // নতুন অনুরোধ আটকানো
+        rotateEmoji.style.animation = "spin 1s linear infinite"; // লোডিং ইফেক্ট চালু
+        findLocationBtnText.textContent = "Working..."; // Change button text
+
+        const apiKey = await getValidApiKey();
+        if (!apiKey) {
+            findLocationBtn.disabled = false;
+            rotateEmoji.style.animation = "none";
+            findLocationBtnText.textContent = originalButtonText; // Revert button text
+            return;
+        }
+
+        const networkType = networkTypeInput.value.toLowerCase();
+        const radioType = networkType === "2g" ? "gsm" : networkType === "3g" ? "umts" : networkType === "4g" ? "lte" : "gsm";
+
+        const requestData = JSON.stringify({
+            token: apiKey,
+            radio: radioType,
+            mcc: 470,
+            mnc: mncInput.value,
+            cells: [{lac: lacInput.value, cid: cellInput.value}],
+            address: 1
+        });
+        console.log(requestData);
+
+        fetch("https://ap1.unwiredlabs.com/v2/process", {
+            method: "POST",
+            body: requestData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    addressElement.textContent = ""; // পূর্বের ঠিকানা মুছবে
+                    addressElement.textContent = data.address;
+                    const googleMapUrl = `https://www.google.com/maps?q=${data.lat},${data.lon}`;
+                    mapLinkElement.textContent = googleMapUrl;
+                    mapLinkElement.href = googleMapUrl;
+                    checkedKeys.clear(); // সফল হলে চেক করা API রিসেট
+                    console.log(data);
+                } else if (data.status === "error") {
+                    alert(data.message); // যদি স্ট্যাটাস "error" হয়, মেসেজ দেখানো হবে
+                } else {
+                    alert("Faced error on API request!");
+                }
+            })
+            .catch(() => alert("Faced error on API request!"))
+            .finally(() => {
+                findLocationBtn.disabled = false;
+                rotateEmoji.style.animation = "none"; // লোডিং বন্ধ
+                findLocationBtnText.textContent = originalButtonText; // Revert button text
+            });
+    }
+
+    // বাটনের ক্লিক ইভেন্ট
+    findLocationBtn.addEventListener("click", event => {
+        event.preventDefault();
+        processApiRequest();
+    });
+
+    // ফর্ম সাবমিট ইভেন্ট আটকানো
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+    });
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Multiple lac cell ids to Google map lat lon locations >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // প্রয়োজনীয় DOM এলিমেন্ট সংগ্রহ
+    const lacCellList = document.getElementById("lacCellList");
+    const convertedLacCellList = document.getElementById("convertedLacCellList");
+    const lacCellLineCount = document.getElementById("lacCellLineCount");
+    const convertedLacCellLineCount = document.getElementById("convertedlacCellLineCount");
+    const downLatLongCsv = document.getElementById("downLatLongCsv");
+
+    let dataArray = []; // গ্লোবাল অ্যারে ব্যবহার করা হবে
+    let checkedBalances = new Set(); // ইতিমধ্যে চেক করা ব্যালেন্স সংরক্ষণ করবে
+
+    // ফাংশন: টেক্সট এরিয়ার লাইনের সংখ্যা গণনা করে আপডেট করা
+    function updateLacCellLineCount(textarea, lineCountElement) {
+        const lines = textarea.value.split(/\r\n|\r|\n/).filter(line => line.trim() !== "").length;
+        lineCountElement.textContent = `Rows / Lines: ${lines}`;
+    }
+
+    // ফাংশন: বাটনের স্ট্যাটাস আপডেট করা
+    function toggleDownloadCsvButton() {
+        if (lacCellList.value.trim() === "" && convertedLacCellList.value.trim() === "") {
+            downLatLongCsv.disabled = true;
+        } else {
+            downLatLongCsv.disabled = false;
+        }
+    }
+
+    // টেক্সট এরিয়াগুলোর পরিবর্তন মনিটর করা
+    lacCellList.addEventListener("input", () => {
+        updateLacCellLineCount(lacCellList, lacCellLineCount);
+        toggleDownloadCsvButton();
+    });
+
+    convertedLacCellList.addEventListener("input", () => {
+        updateLacCellLineCount(convertedLacCellList, convertedLacCellLineCount);
+        toggleDownloadCsvButton();
+    });
+
+    // শুরুতেই বাটনকে নিষ্ক্রিয় করা ও লাইন কাউন্ট আপডেট করা
+    toggleDownloadCsvButton();
+    updateLacCellLineCount(lacCellList, lacCellLineCount);
+    updateLacCellLineCount(convertedLacCellList, convertedLacCellLineCount);
+
+    document.getElementById("lacCellList").addEventListener("input", function () {
+        processLacCellData();
+    });
+
+    // ইনপুট থেকে ডাটা প্রসেস করা এবং অবজেক্ট তৈরি করা
+    function processLacCellData() {
+        const inputText = document.getElementById("lacCellList").value;
+        const lines = inputText.trim().split("\n");
+
+        if (lines.length === 0) {
+            alert("Please paste data in right format 01!");
+            return;
+        }
+
+        const headers = lines[0].split("\t");
+        if (!headers.includes("C") || !headers.includes("L") || !headers.includes("N") || !headers.includes("M") || !headers.includes("Co")) {
+            alert("Please paste data in right format 02!");
+            return;
+        }
+
+        dataArray = []; // গ্লোবাল অ্যারে ব্যবহার করা হবে
+
+        for (let i = 1; i < lines.length; i++) {
+            const columns = lines[i].split("\t");
+            if (columns.length < headers.length) continue;
+
+            let baseData = {};
+            headers.forEach((header, index) => {
+                baseData[header] = columns[index] || "";
+            });
+
+            if (baseData["N"].includes(",")) {
+                const networkTypes = baseData["N"].split(",").map(n => n.trim());
+                networkTypes.forEach(nt => {
+                    let newData = {...baseData};
+                    newData["N"] = nt;
+                    dataArray.push(newData);
+                });
+            } else {
+                dataArray.push(baseData);
+            }
+        }
+
+        console.table(dataArray);
+    }
+
+    // **ব্যালেন্স চেক করা ও API কল পাঠানো**
+    async function getUsableApiKey() {
+        for (let i = 0; i < apiKeys.length; i++) {
+            const apiKey = apiKeys[i];
+
+            if (checkedBalances.has(apiKey)) continue;
+            checkedBalances.add(apiKey);
+
+            const response = await fetch(`https://us1.unwiredlabs.com/v2/balance?token=${apiKey}`);
+            const data = await response.json();
+
+            console.log("Balance Check:", apiKey, data);
+
+            if (data.status === "ok" && data.balance_geolocation > 0) {
+                return {apiKey, balance: data.balance_geolocation};
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 1200)); // Wait for 1.2 seconds before next check
+        }
+        return null;
+    }
+
+    // **লোকেশন API ডাটা ফেচ করা**
+    async function fetchLocationData() {
+        document.getElementById("downLatLongCsv").disabled = true;
+        document.getElementById("downLatLongCsv").innerText = "Working...";
+
+        let remainingRequests = dataArray.length;
+        let currentIndex = 0;
+
+        while (remainingRequests > 0) {
+            const apiInfo = await getUsableApiKey();
+            if (!apiInfo) {
+                alert("There is no enough balance in APIs!");
+                break;
+            }
+
+            let {apiKey, balance} = apiInfo;
+            let requestsToSend = Math.min(balance, remainingRequests);
+
+            console.log(`Using API Key: ${apiKey} | Sending ${requestsToSend} requests`);
+
+            const requests = [];
+            for (let i = 0; i < requestsToSend; i++) {
+                const item = dataArray[currentIndex];
+                const radioType = item.N.toLowerCase() === "2g" ? "gsm" : item.N.toLowerCase() === "3g" ? "umts" : item.N.toLowerCase() === "4g" ? "lte" : "gsm";
+
+                const requestData = {
+                    token: apiKey,
+                    radio: radioType,
+                    mcc: 470,
+                    mnc: item.M,
+                    cells: [{lac: item.L, cid: item.C}],
+                    address: 1
+                };
+
+                requests.push(
+                    fetch("https://ap1.unwiredlabs.com/v2/process", {
+                        method: "POST",
+                        body: JSON.stringify(requestData)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "ok") {
+                                item.lat = data.lat;
+                                item.lon = data.lon;
+                                item.address = data.address;
+                            } else {
+                                item.lat = item.lon = item.address = data.message;
+                            }
+                            updateConvertedTextarea(); // প্রতিটি অনুরোধের পর আপডেট করা
+                            return item;
+                        })
+                );
+                currentIndex++;
+            }
+
+            await Promise.all(requests);
+            remainingRequests -= requestsToSend;
+        }
+
+        for (let i = currentIndex; i < dataArray.length; i++) {
+            dataArray[i].lat = "No balance";
+            dataArray[i].lon = "No balance";
+            dataArray[i].address = "No balance";
+        }
+
+        updateConvertedTextarea();
+    }
+
+    async function downloadCsvFile() {
+        if (dataArray.length === 0) return;
+
+        const header = Object.keys(dataArray[0]).map(h => `"${h}"`).join(",");
+        const csvData = dataArray.map(row => Object.values(row).map(value => `"${value}"`).join(",")).join("\n");
+
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
+        });
+
+        const csvFileName = `Lac Cell to Google map mape [${formattedDate}].csv`;
+
+        const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(header + "\n" + csvData);
+        const link = document.createElement("a");
+        link.setAttribute("href", csvContent);
+        link.setAttribute("download", csvFileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // **CSV আপডেট করা**
+    function updateConvertedTextarea() {
+        if (dataArray.length === 0) {
+            document.getElementById("convertedLacCellList").value = "";
+            return;
+        }
+        const header = Object.keys(dataArray[0]).map(h => `"${h}"`).join(",");
+        const csvData = dataArray.map(row => Object.values(row).map(value => `"${value}"`).join(",")).join("\n");
+        document.getElementById("convertedLacCellList").value = header + "\n" + csvData;
+    }
+
+    // বাটনের ক্লিক ইভেন্ট
+    downLatLongCsv.addEventListener("click", function () {
+        fetchLocationData().then(() => {
+            downloadCsvFile();
+            document.getElementById("downLatLongCsv").disabled = false;
+            document.getElementById("downLatLongCsv").innerText = "Download CSV";
+        });
+    });
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Convert CDR date string to formated date & time string >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    const unformatedDate = document.getElementById("unformatedDate");
+    const formatedDate = document.getElementById("formatedDate");
+    const copyFormatedDate = document.getElementById("copyFormatedDate");
+    const formatedDateRowNo = document.getElementById("formatedDateRowNo");
+    const unformatedDateRowNo = document.getElementById("unformatedDateRowNo");
+
+    function updateButtonState() {
+        copyFormatedDate.disabled = unformatedDate.value.trim() === "";
+    }
+
+    function convertTimestampToFormattedString(timestamp) {
+        if (!/^\d{14}$/.test(timestamp)) {
+            return timestamp; // যদি ফরম্যাট ভুল হয়, পরিবর্তন করা হবে না
+        }
+
+        const year = timestamp.substring(0, 4);
+        const month = timestamp.substring(4, 6);
+        const day = timestamp.substring(6, 8);
+        const hour = timestamp.substring(8, 10);
+        const minute = timestamp.substring(10, 12);
+
+        const date = new Date(year, month - 1, day, hour, minute);
+
+        if (isNaN(date.getTime())) {
+            return timestamp; // যদি ইনভ্যালিড হয়, পরিবর্তন করা হবে না
+        }
+
+        const formattedDate = `${month}/${day}/${year}`;
+        const formattedTime = date.toLocaleTimeString("en-US", {hour: "2-digit", minute: "2-digit"});
+
+        return `${formattedDate}\t${formattedTime}`;
+    }
+
+    unformatedDate.addEventListener("input", function () {
+        let lines = unformatedDate.value.split("\n");
+        let convertedLines = lines.map(line => convertTimestampToFormattedString(line.trim()));
+
+        formatedDate.value = convertedLines.join("\n");
+
+        formatedDateRowNo.textContent = `Rows / Lines: ${lines.length}`;
+        unformatedDateRowNo.textContent = `Converted rows: ${convertedLines.length}`;
+
+        updateButtonState();
+    });
+
+    copyFormatedDate.addEventListener("click", function () {
+        formatedDate.select();
+        formatedDate.setSelectionRange(0, 999999); // মোবাইল কম্প্যাটিবিলিটির জন্য
+
+        try {
+            document.execCommand("copy");
+            window.getSelection().removeAllRanges(); // সিলেকশন রিসেট
+
+            showNotification("Copy successful!", 3000); // নোটিফিকেশন দেখানো
+        } catch (err) {
+            console.error("Error copying text:", err);
+        }
+    });
+
+    updateButtonState();
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Convert CDR bparty code to readable text >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // DOM element references
+    const bpartyInput = document.getElementById('bpartyInput');
+    const bpartyOutput = document.getElementById('bpartyOutput');
+    const copyConvertedText = document.getElementById('copyConvertedText');
+    const bpartyInputLines = document.getElementById('bpartyInputLines');
+    const bpartyOutputLines = document.getElementById('bpartyOutputLines');
+
+    // Function to enable or disable the copy button
+    function updateButtonStates() {
+        copyConvertedText.disabled = bpartyOutput.value.trim() === "";
+    }
+
+    // Function to convert hex code to string, cleaning unwanted characters
+    function convertHexToString(hexCode) {
+        let cleanedHexCode = hexCode.replace(/\s+/g, ' ').trim(); // Remove extra spaces and trim
+        cleanedHexCode = cleanedHexCode.replace(/[\x06\x91\x92]/g, ' '); // Replace non-printable characters
+
+        // Check if the code starts with 880 or +880, and then remove it for checking purposes
+        let checkHexCode = cleanedHexCode.replace(/^(880|\+880)/, '');
+
+        // Check if the cleaned string is a valid hex code and contains at least one letter A-F or a-f
+        if (/^[0-9A-Fa-f]+$/.test(checkHexCode) && /[a-fA-F]/.test(checkHexCode)) {
+            // Process as a hex string if valid
+            try {
+                return checkHexCode.match(/.{1,2}/g).map(byte =>
+                    byte === "11" ? " " : String.fromCharCode(parseInt(byte, 16))
+                ).join('');
+            } catch (e) {
+                return cleanedHexCode;
+            }
+        } else {
+            // If it's not a valid hex string, return it as is
+            return cleanedHexCode;
+        }
+    }
+
+    // Event listener for input text changes
+    bpartyInput.addEventListener('input', () => {
+        let lines = bpartyInput.value.split('\n');
+        bpartyOutput.value = lines.map(convertHexToString).join('\n');
+        bpartyInputLines.textContent = `Rows / Lines: ${lines.length}`;
+        bpartyOutputLines.textContent = `Converted rows: ${bpartyOutput.value.split('\n').length}`;
+        updateButtonStates();
+    });
+
+    // Function to show a notification
+    function showNotification(message, duration = 3000) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.position = 'fixed';
+        notification.style.bottom = '80px'; // You can adjust this to set vertical position
+        notification.style.left = '50%'; // Move it to the center horizontally
+        notification.style.transform = 'translateX(-50%)'; // Correctly center it
+        notification.style.textAlign = 'center';
+        notification.style.minWidth = "300px";
+        notification.style.padding = '10px';
+        notification.style.backgroundColor = '#1D6F42';
+        notification.style.color = '#fff';
+        notification.style.borderRadius = '5px';
+        notification.style.zIndex = '1000';
+        notification.style.boxShadow = '0px 4px 10px rgba(0, 0, 0, 0.3)';
+
+        // Append to the body
+        document.body.appendChild(notification);
+
+        // Remove the notification after the specified duration
+        setTimeout(() => {
+            notification.remove();
+        }, duration);
+    }
+
+    // Copy text to clipboard
+    copyConvertedText.addEventListener('click', () => {
+        bpartyOutput.select();
+        bpartyOutput.setSelectionRange(0, 999999); // For mobile compatibility
+
+        try {
+            document.execCommand('copy');
+
+            // Deselect the textarea after copying
+            window.getSelection().removeAllRanges();
+
+            // Show a floating notification
+            showNotification('Copy successful!', 3000); // Calling the notification function
+        } catch (err) {
+            console.error('Error copying text:', err);
+        }
+    });
+
+    updateButtonStates();
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Convert address to CSV >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addressList = document.getElementById("addressList");
+        const addressListCsv = document.getElementById("addressListCsv");
+        const downloadAddressCSV = document.getElementById("downloadAddressCSV");
+        const addressListCount = document.getElementById("addressListCount");
+        const convertedAddressListCount = document.getElementById("convertedAddressListCount");
+
+        function updateButtonState() {
+            downloadAddressCSV.disabled = addressList.value.trim() === "";
+        }
+
+        function convertToCsvFormat(text) {
+            let lines = text.split("\n").map(line => line).filter(line => line !== "");
+
+            return lines.map(line => {
+                let columns = line.split("\t"); // Tab-separated হলে মাল্টি-কলাম হবে
+                return columns.map(col => `"${col.replace(/"/g, '""')}"`).join(",");
+            }).join("\n");
+        }
+
+        addressList.addEventListener("input", function () {
+            let lines = addressList.value.split("\n").filter(line => line.trim() !== "");
+
+            addressListCsv.value = convertToCsvFormat(addressList.value);
+
+            addressListCount.textContent = `Rows / Lines: ${lines.length}`;
+            convertedAddressListCount.textContent = `Converted rows: ${lines.length}`;
+
+            updateButtonState();
+        });
+
+        function downloadCSV() {
+            let csvContent = "data:text/csv;charset=utf-8," + addressListCsv.value;
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Google My Maps Address.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        downloadAddressCSV.addEventListener("click", downloadCSV);
+
+        updateButtonState();
+
+
+        //**
+        // Cradetialls (encrypted)
+        // Y29nZWM3NDM4OUBudW1lcm9iby5jb20KeWVnaXY3NTQxM0BtaW5kdWxzLmNvbQpha3dscmdAYXp6YW5jb2ZmZWUuY29tCmF6M3Jzam9Aa2VuaHBoaW0ubmV0CmJhbmdsYTEyMzRAIS4uLkg=
+        // **//
+    });
+
+</script>
+
+</body>
+
+</html>
